@@ -1,0 +1,22 @@
+# Backend
+backend/.env
+backend/__pycache__/
+backend/*.db
+backend/test_*.py
+backend/.venv/
+backend/env/
+backend/venv/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/build_err.txt
+frontend/.DS_Store
+
+# Miscellaneous
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
