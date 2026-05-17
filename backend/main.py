@@ -37,5 +37,11 @@ app.include_router(analytics.router)
 app.include_router(news.router)
 
 @app.get("/")
+@app.head("/")
 def read_root():
     return {"message": "Welcome to VeriNews AI"}
+
+@app.get("/health")
+@app.head("/health")
+def health_check():
+    return {"status": "ok"}

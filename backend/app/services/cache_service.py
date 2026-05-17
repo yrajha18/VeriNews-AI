@@ -15,9 +15,9 @@ class CacheService:
             self.client = redis.from_url(self.redis_url, decode_responses=True)
             # Test connection
             self.client.ping()
-            print(f"Connected to Redis at {self.redis_url}")
-        except Exception as e:
-            print(f"Redis connection failed: {e}. Using in-memory fallback.")
+            print(f"✅ Connected to Redis at {self.redis_url}")
+        except Exception:
+            print("ℹ️  Redis not available. Using in-memory cache fallback.")
             self.client = None
 
     def _generate_key(self, content: str) -> str:
