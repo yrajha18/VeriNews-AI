@@ -2,15 +2,24 @@ from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException
 from typing import List, Dict, Any
 import os
 import tempfile
-from langchain_community.document_loaders import PyPDFLoader, TextLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from ..services.pinecone_service import pinecone_service
 from ..services.gemini_service import gemini_service
 from ..database import get_db
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from .auth import get_current_user, require_role
 from ..models import User, UserRole
+
+# Optional Pinecone / document loader support
+try:
+    from langchain_community.document_loaders import PyPDFLoader, TextLoader
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
+    from ..services.pinecone_service import pinecone_service
+    PINECONE_AVAILABLE = True
+except ImportError:
+    PINECONE_AVAILABLE = False
+    class _FakePinecone:
+        def is_ready(self): return False
+    pinecone_service = _FakePinecone()
 
 router = APIRouter(prefix="/chat", tags=["Chat & RAG"])
 
@@ -21,8 +30,8 @@ class ChatMessage(BaseModel):
 
 @router.post("/ingest")
 async def ingest_document(file: UploadFile = File(...), current_user: User = Depends(require_role([UserRole.admin]))):
-    if not pinecone_service.is_ready():
-        raise HTTPException(status_code=503, detail="Pinecone vector store is not initialized. Check PINECONE_API_KEY.")
+    if not PINECONE_AVAILABLE or not pinecone_service.is_ready():
+        raise HTTPException(status_code=503, detail="Document ingestion unavailable. Pinecone is not configured.")
     
     # Save uploaded file temporarily
     suffix = os.path.splitext(file.filename)[1]

@@ -7,13 +7,8 @@ pydantic-settings
 python-dotenv
 langchain
 langchain-google-genai
-langchain-pinecone
-pinecone-client
 python-multipart
-pypdf
 email-validator
-langchain-community
-langchain-text-splitters
 PyJWT
 passlib[bcrypt]
 google-auth
