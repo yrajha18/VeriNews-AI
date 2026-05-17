@@ -1,5 +1,6 @@
 fastapi
-uvicorn
+uvicorn[standard]
+gunicorn
 sqlalchemy
 psycopg2-binary
 pydantic
@@ -14,4 +15,5 @@ passlib[bcrypt]
 google-auth
 requests
 beautifulsoup4
+lxml
 redis

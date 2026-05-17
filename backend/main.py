@@ -18,9 +18,13 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI(title="VeriNews AI - Fake News Detection")
 
 # Configure CORS
+# Set FRONTEND_URL env var on Render to your Vercel URL e.g. https://verinews.vercel.app
+FRONTEND_URL = os.getenv("FRONTEND_URL", "*")
+origins = [FRONTEND_URL] if FRONTEND_URL != "*" else ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In production, replace with frontend URL
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -34,4 +38,4 @@ app.include_router(news.router)
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to Smart AI Support Desk API"}
+    return {"message": "Welcome to VeriNews AI"}
