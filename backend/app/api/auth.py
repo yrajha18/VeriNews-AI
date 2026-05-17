@@ -77,8 +77,11 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
 @router.post("/google", response_model=Token)
 async def google_auth(request: GoogleLoginRequest, db: Session = Depends(get_db)):
+    client_id = os.getenv("GOOGLE_CLIENT_ID")
+    if not client_id:
+        raise HTTPException(status_code=500, detail="Google OAuth is not configured on the server. Set GOOGLE_CLIENT_ID env var.")
+    
     try:
-        client_id = os.getenv("GOOGLE_CLIENT_ID")
         print(f"DEBUG: Verifying Google token for Client ID: {client_id}")
         
         # Verify Google token
@@ -102,7 +105,7 @@ async def google_auth(request: GoogleLoginRequest, db: Session = Depends(get_db)
                 email=email,
                 full_name=full_name,
                 google_id=google_id,
-                role=UserRole.customer # Default role
+                role=UserRole.customer
             )
             db.add(user)
             db.commit()
@@ -111,6 +114,8 @@ async def google_auth(request: GoogleLoginRequest, db: Session = Depends(get_db)
         access_token = create_access_token(data={"sub": user.email})
         return {"access_token": access_token, "token_type": "bearer", "user": user}
     except ValueError as e:
-        # Invalid token
         print(f"DEBUG: Google token verification failed: {str(e)}")
         raise HTTPException(status_code=400, detail=f"Invalid Google token: {str(e)}")
+    except Exception as e:
+        print(f"DEBUG: Unexpected Google auth error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Google authentication failed: {str(e)}")
